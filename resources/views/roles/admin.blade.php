@@ -100,9 +100,9 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-charcoal mb-4">Performa Akademik per Kelas</h3>
+                            <h3 class="text-lg font-semibold text-charcoal mb-4">Distribusi Siswa per Kelas</h3>
                             <div class="h-80">
-                                <canvas id="academicPerformanceChart"></canvas>
+                                <canvas id="studentsPerClassChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -185,19 +185,23 @@
 
     <!-- Chart.js Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Academic Performance Chart
-            const ctx = document.getElementById('academicPerformanceChart').getContext('2d');
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('studentsPerClassChart').getContext('2d');
             
-            const academicChart = new Chart(ctx, {
+            // Data dinamis dari controller
+            const classLabels = @json($classLabels);
+            const studentCounts = @json($studentCounts);
+
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['10A', '10B', '10C', '11A', '11B', '11C', '12A', '12B', '12C'],
+                    labels: classLabels,
                     datasets: [{
-                        label: 'Rata-rata Nilai',
-                        data: [85, 78, 82, 88, 75, 80, 90, 85, 87],
+                        label: 'Jumlah Siswa',
+                        data: studentCounts,
+                        // Gaya visual dari contoh Anda
                         backgroundColor: '#97BE5A', // lime-custom
-                        borderColor: '#0B666A',     // teal-custom
+                        borderColor: '#0B666A',      // teal-custom
                         borderWidth: 1,
                         borderRadius: 4,
                         borderSkipped: false,
@@ -208,39 +212,39 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false
+                            display: false // Legenda dihilangkan
                         },
-                        tooltip: {
+                        tooltip: { // Gaya tooltip dari contoh Anda
                             backgroundColor: '#0B666A',
                             titleColor: '#FCFCFC',
                             bodyColor: '#FCFCFC',
                             borderColor: '#97BE5A',
-                            borderWidth: 1
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                title: (context) => `Kelas ${context[0].label}`,
+                                label: (context) => `${context.raw} siswa`
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100,
                             ticks: {
                                 color: '#3D3D3D',
-                                font: {
-                                    size: 12
-                                }
+                                font: { size: 12 }
                             },
                             grid: {
-                                color: '#EDF5F5'
+                                color: '#EDF5F5' // Warna grid dari contoh Anda
                             }
                         },
                         x: {
                             ticks: {
                                 color: '#3D3D3D',
-                                font: {
-                                    size: 12
-                                }
+                                font: { size: 12 }
                             },
                             grid: {
-                                display: false
+                                display: false // Grid vertikal dihilangkan
                             }
                         }
                     }

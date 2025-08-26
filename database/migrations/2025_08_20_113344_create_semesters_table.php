@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // Semester 1, Semester 2, dst
             $table->integer('grade_level'); // 10, 11, 12
-            $table->string('academic_year'); // 2024/2025
+            $table->string('school_year'); // 2024/2025
             $table->date('start_date');
             $table->date('end_date');
             $table->boolean('is_active')->default(false);

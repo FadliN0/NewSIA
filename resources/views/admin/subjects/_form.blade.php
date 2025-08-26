@@ -39,12 +39,15 @@
 </div>
 
 <div class="flex items-center justify-end mt-6">
-    <a href="{{ route('admin.subjects.index') }}" class="text-sm text-charcoal/80 mr-4">Batal</a>
-    <button type="submit" class="px-4 py-2 bg-lime-accent text-white rounded-lg font-semibold uppercase text-xs tracking-widest">
+    <a href="{{ route('admin.subjects.index') }}" class="text-sm text-charcoal/80 mr-4 hover:underline">
+        {{ __('Batal') }}
+    </a>
+
+    <x-primary-button>
         @if(isset($subject))
-            Perbarui
+            {{ __('Perbarui') }}
         @else
-            Simpan
+            {{ __('Simpan') }}
         @endif
-    </button>
+    </x-primary-button>
 </div>

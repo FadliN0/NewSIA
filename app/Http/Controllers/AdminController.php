@@ -25,19 +25,18 @@ class AdminController extends Controller
         $totalclass_room = ClassRoom::count();
         $totalSubjects = Subject::count();
 
-        // Get academic performance data for chart
-        $academicPerformance = $this->getAcademicPerformanceData();
-
-        // Get recent activities (you can customize this based on your needs)
-        $recentActivities = $this->getRecentActivities();
+        // Data untuk chart "Jumlah Siswa per Kelas"
+        $classes = ClassRoom::withCount('students')->orderBy('name')->get();
+        $classLabels = $classes->pluck('name'); // ['10A', '10B', '11A', ...]
+        $studentCounts = $classes->pluck('students_count'); // [30, 28, 32, ...]
 
         return view('roles.admin', compact(
             'totalStudents',
             'totalTeachers', 
             'totalclass_room',
             'totalSubjects',
-            'academicPerformance',
-            'recentActivities'
+            'classLabels',
+            'studentCounts'
         ));
     }
 

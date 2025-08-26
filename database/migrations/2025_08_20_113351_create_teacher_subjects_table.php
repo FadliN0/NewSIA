@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('teacher_id')->constrained()->cascadeOnDelete();
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('class_room_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('semester_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_room_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('semester_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
 
             // Satu guru tidak bisa mengajar mata pelajaran yang sama di kelas yang sama dalam semester yang sama

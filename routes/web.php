@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\SubjectController;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +36,7 @@ Route::middleware(['auth', 'role:admin'])
     
     // Students Management  
     Route::resource('students', StudentController::class);
-    Route::get('students/class/{class}', [StudentController::class, 'byClass'])->name('students.by-class');
+    // Route::get('students/class/{class}', [StudentController::class, 'byClass'])->name('students.by-class');
     
     // Teachers Management
     Route::resource('teachers', TeacherController::class);
@@ -43,6 +44,8 @@ Route::middleware(['auth', 'role:admin'])
     
     // Subjects Management
     Route::resource('subjects', SubjectController::class);
+
+    Route::resource('semesters', SemesterController::class);
     
     // Reports
     Route::get('reports/academic', [AdminController::class, 'academicReports'])->name('reports.academic');

@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
                 $semesters[] = Semester::create([
                     'name' => "Semester $semNum",
                     'grade_level' => $gradeLevel,
-                    'academic_year' => $year,
+                    'school_year' => $year,
                     'start_date' => $semNum == 1 ? "$gradeLevel-07-01" : "$gradeLevel-01-01",
                     'end_date' => $semNum == 1 ? "$gradeLevel-12-31" : ($gradeLevel + 1) . "-06-30",
                     'is_active' => $year === '2024/2025' && $semNum === 2,

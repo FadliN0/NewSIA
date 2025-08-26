@@ -41,6 +41,11 @@
                <i data-lucide="book-open" class="w-5 h-5"></i>
                <span x-show="open" class="ml-2">Mata Pelajaran</span>
             </a>
+            <a href="{{ route('admin.semesters.index') }}" 
+               class="flex items-center px-3 py-2 rounded hover:bg-gray-100">
+               <i data-lucide="time" class="w-5 h-5"></i>
+               <span x-show="open" class="ml-2">Semester</span>
+            </a>
             <a href="{{ route('admin.reports.academic') }}" 
                class="flex items-center px-3 py-2 rounded hover:bg-gray-100">
                <i data-lucide="file-text" class="w-5 h-5"></i>
