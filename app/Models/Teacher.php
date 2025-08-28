@@ -46,6 +46,11 @@ class Teacher extends Model
         return $this->hasManyThrough(Attendance::class, TeacherSubject::class);
     }
 
+    public function assignments()
+    {
+        return $this->hasMany(TeacherSubject::class);
+    }
+
     // Helper methods
     public function getAge()
     {

@@ -9,6 +9,7 @@ use App\Models\Teacher;
 use App\Models\ClassRoom; // Assuming your class model is named ClassModel
 use App\Models\Subject;
 use App\Models\Grade;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -30,13 +31,44 @@ class AdminController extends Controller
         $classLabels = $classes->pluck('name'); // ['10A', '10B', '11A', ...]
         $studentCounts = $classes->pluck('students_count'); // [30, 28, 32, ...]
 
+        // --- DATA BARU UNTUK CHART PERFORMA AKADEMIK ---
+        $academicPerformance = Grade::join('subjects', 'grades.subject_id', '=', 'subjects.id')
+            ->select('subjects.name as subject_name', DB::raw('AVG(grades.score) as average_score'))
+            ->groupBy('subjects.name')
+            ->orderBy('subjects.name')
+            ->get();
+        $subjectLabels = $academicPerformance->pluck('subject_name');
+        $averageScores = $academicPerformance->pluck('average_score')->map(fn($score) => round($score, 2));
+
+        // --- DATA BARU UNTUK CHART TINGKAT KEHADIRAN ---
+        $attendanceData = Attendance::join('subjects', 'attendances.subject_id', '=', 'subjects.id')
+            ->select(
+                'subjects.name as subject_name',
+                DB::raw('SUM(CASE WHEN attendances.status = "Hadir" THEN 1 ELSE 0 END) as present_count'),
+                DB::raw('COUNT(attendances.id) as total_count')
+            )
+            ->groupBy('subjects.name')->orderBy('subjects.name')->get();
+
+        $attendanceLabels = $attendanceData->pluck('subject_name');
+        $attendancePercentages = $attendanceData->map(function ($item) {
+            return $item->total_count > 0 ? round(($item->present_count / $item->total_count) * 100, 2) : 0;
+        });
+
+        $recentStudents = Student::with('classRoom')->latest()->take(5)->get();
+        
+        // Kirim semua data ke view
         return view('roles.admin', compact(
             'totalStudents',
             'totalTeachers', 
             'totalclass_room',
             'totalSubjects',
             'classLabels',
-            'studentCounts'
+            'studentCounts',
+            'subjectLabels',
+            'averageScores',
+            'attendanceLabels',
+            'attendancePercentages',
+            'recentStudents'
         ));
     }
 
@@ -61,47 +93,6 @@ class AdminController extends Controller
                 return round($grade, 1);
             })->toArray()
         ];
-    }
-
-    /**
-     * Get recent activities for dashboard
-     */
-    private function getRecentActivities()
-    {
-        $activities = [];
-
-        // Recent students added
-        $recentGrades = Grade::with(['student', 'assignment.subject'])
-            ->latest()
-            ->limit(2)
-            ->get();
-
-        foreach ($recentGrades as $grade) {
-            $activities[] = [
-                'type' => 'grade_added', 
-                'message' => "Nilai {$grade->assignment->subject->name} untuk {$grade->student->name} telah diinput",
-                'time' => $grade->created_at->diffForHumans(),
-                'icon_color' => 'lime-accent'
-            ];
-        }
-
-        // Recent grades added (if you have timestamps)
-        $recentGrades = Grade::with(['student', 'subject'])
-            ->latest()
-            ->limit(2)
-            ->get();
-
-        foreach ($recentGrades as $grade) {
-            $activities[] = [
-                'type' => 'grade_added', 
-                'message' => "Nilai {$grade->subject->name} untuk {$grade->student->name} telah diinput",
-                'time' => $grade->created_at->diffForHumans(),
-                'icon_color' => 'lime-accent'
-            ];
-        }
-
-        // Sort by time and limit to 5 most recent
-        return collect($activities)->sortByDesc('time')->take(5)->values();
     }
 
     /**

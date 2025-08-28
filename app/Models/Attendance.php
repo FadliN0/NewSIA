@@ -11,14 +11,20 @@ class Attendance extends Model
 
     protected $fillable = [
         'student_id',
-        'teacher_subject_id',
-        'date',
+        'subject_id',
+        'semester_id',
+        'attendance_date',
         'status',
         'notes',
     ];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
-        'date' => 'date',
+        'attendance_date' => 'date',
     ];
 
     // Relationships

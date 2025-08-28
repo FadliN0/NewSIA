@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Teacher\DashboardController;
+use App\Http\Controllers\Teacher\AttendanceController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +21,7 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {  
     return match(auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),    
-        'guru' => redirect()->route('guru.dashboard'),
+        'teacher' => redirect()->route('teacher.dashboard'),
         default => redirect()->route('siswa.dashboard'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -57,8 +59,13 @@ Route::middleware(['auth', 'role:admin'])
     Route::post('quick-actions/create-user-account', [AdminController::class, 'quickCreateUserAccount'])->name('quick.create-user-account');
 });
 
-Route::middleware(['auth', 'role:guru'])->group(function () {
-    Route::get('/guru', fn() => view('roles.guru'))->name('guru.dashboard');
+Route::middleware(['auth', 'role:teacher'])
+->prefix('teacher') // Tambahkan prefix agar URL menjadi /teacher/...
+->as('teacher.')    // Tambahkan name agar menjadi teacher.*
+->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('attendances', AttendanceController::class)->only(['index', 'create', 'store']);
 });
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {

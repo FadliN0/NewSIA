@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+
         // 2. Create Semesters (6 semester untuk 3 tahun)
         $semesters = [];
         $academicYears = ['2022/2023', '2023/2024', '2024/2025'];
@@ -143,6 +144,12 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+
+        $this->call([
+            GradeSeeder::class,
+            AttendanceSeeder::class,
+        ]);
+        
 
         echo "✅ Phase 2 Database Setup Complete!\n";
         echo "📊 Summary:\n";

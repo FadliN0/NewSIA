@@ -14,14 +14,12 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('teacher_subject_id')->constrained()->cascadeOnDelete();
-            $table->date('date');
-            $table->enum('status', ['present', 'absent', 'late', 'sick', 'permission']);
-            $table->text('notes')->nullable();
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete(); // WAJIB: Absen untuk mapel apa
+            $table->foreignId('semester_id')->constrained()->cascadeOnDelete(); // WAJIB: Absen di semester mana
+            $table->date('attendance_date'); // Tanggal absensi
+            $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alfa']); // Status kehadiran
+            $table->text('notes')->nullable(); // Catatan dari guru
             $table->timestamps();
-
-            // Satu siswa hanya bisa punya satu absensi per mata pelajaran per hari
-            $table->unique(['student_id', 'teacher_subject_id', 'date']);
         });
     }
 

@@ -11,7 +11,10 @@ class Grade extends Model
 
     protected $fillable = [
         'student_id',
+        'subject_id',
+        'semester_id',
         'assignment_id',
+        'grade_type',
         'score',
         'notes',
     ];

@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('assignment_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete(); // WAJIB: Untuk tahu ini nilai mapel apa
+            $table->foreignId('semester_id')->constrained()->cascadeOnDelete(); // WAJIB: Untuk tahu ini nilai semester mana
+            $table->foreignId('assignment_id')->nullable()->constrained()->cascadeOnDelete(); // OPSIONAL: Jika nilai ini berasal dari tugas tertentu
+
+            $table->string('grade_type'); // Contoh: 'Tugas', 'UTS', 'UAS'
             $table->decimal('score', 5, 2); // nilai dengan 2 desimal
             $table->text('notes')->nullable(); // catatan guru
             $table->timestamps();
-
-            // Satu siswa hanya bisa punya satu nilai per assignment
-            $table->unique(['student_id', 'assignment_id']);
         });
     }
 
