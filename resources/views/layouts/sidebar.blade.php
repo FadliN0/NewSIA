@@ -36,6 +36,11 @@
                <i data-lucide="user-check" class="w-5 h-5"></i>
                <span x-show="open" class="ml-2">Kelola Guru</span>
             </a>
+            <a href="{{ route('admin.assignments.index') }}" 
+               class="flex items-center px-3 py-2 rounded hover:bg-gray-100">
+               <i data-lucide="user-check" class="w-5 h-5"></i>
+               <span x-show="open" class="ml-2">Penugasan Guru</span>
+            </a>
             <a href="{{ route('admin.subjects.index') }}" 
                class="flex items-center px-3 py-2 rounded hover:bg-gray-100">
                <i data-lucide="book-open" class="w-5 h-5"></i>

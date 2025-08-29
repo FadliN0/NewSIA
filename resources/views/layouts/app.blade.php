@@ -25,13 +25,13 @@
         <div class="min-h-screen">
             {{-- Sidebar khusus admin --}}
             @auth
-                @if(auth()->user()->role === 'admin')
-                    @include('layouts.sidebar')
+                @if(auth()->user()->role !== 'admin')
+                    @include('layouts.navigation')
                 @endif
             @endauth
 
             {{-- Main content area --}}
-            <div class="@auth @if(auth()->user()->role === 'admin') ml-64 @endif @endauth">
+            <div class="@auth @if(auth()->user()->role !== 'admin') ml-64 @endif @endauth">
                 {{-- Page Heading --}}
                 @isset($header)
                     <header class="bg-white shadow">

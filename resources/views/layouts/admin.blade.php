@@ -24,7 +24,14 @@
         
         <!-- Main Content -->
         <div class="flex-1 flex flex-col ml-64"> <!-- ml-64 sesuaikan dengan lebar sidebar -->
-
+            <!-- Header -->
+            @if (isset($header))
+            <header class="bg-white shadow-sm border-b">
+                    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
             <!-- Page Content -->
             <main class="flex-1">
                 {{ $slot }}

@@ -8,28 +8,42 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan halaman utama dashboard guru.
-     */
     public function index()
     {
-        // Ambil guru yang sedang login
         $teacher = Auth::user()->teacher;
 
         if (!$teacher) {
-            // Jika akun user tidak terhubung dengan data guru, kembali dengan error
             Auth::logout();
             return redirect('/login')->with('error', 'Akun Anda tidak terhubung dengan data guru.');
         }
 
-        // Ambil data mata pelajaran yang diajar oleh guru ini
-        // Eager load relasi 'subjects' untuk efisiensi
-        $teacher->load('subjects');
-        $subjectsTaught = $teacher->subjects;
-        
-        // Di masa depan, kita akan mengambil data kelas dari tabel teacher_subjects
-        // Untuk sekarang, kita tampilkan dulu mata pelajarannya
+        // 1. Ambil semua data penugasan dari database
+        $allAssignments = $teacher->assignments()->with(['classRoom.students', 'subject'])->get();
 
-        return view('roles.teacher', compact('teacher', 'subjectsTaught'));
+        // 2. INI PERBAIKANNYA: Saring dan buang data penugasan yang kelasnya sudah tidak ada
+        $assignments = $allAssignments->filter(function ($assignment) {
+            return $assignment->classRoom !== null;
+        });
+        
+        // 3. Sekarang, semua proses di bawah ini aman dari error null
+        $classAssignments = $assignments->groupBy('classRoom.name');
+
+        // Hitung data untuk kartu statistik
+        $totalClasses = $assignments->pluck('class_room_id')->unique()->count();
+        $totalSubjects = $assignments->pluck('subject_id')->unique()->count();
+        
+        $totalStudents = $assignments->flatMap(function ($assignment) {
+            // Kode ini sekarang aman karena kita sudah membuang data yang classRoom-nya null
+            return $assignment->classRoom->students->pluck('id');
+        })->unique()->count();
+
+
+        return view('roles.teacher', compact(
+            'teacher', 
+            'classAssignments',
+            'totalClasses',
+            'totalSubjects',
+            'totalStudents'
+        ));
     }
 }

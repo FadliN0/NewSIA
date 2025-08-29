@@ -22,6 +22,6 @@ class AttendanceController extends Controller
         // Kelompokkan berdasarkan kelas untuk tampilan yang lebih rapi
         $classAssignments = $assignments->groupBy('classRoom.name');
 
-        return view('teacher.attendance.index', compact('classAssignments'));
+        return view('teacher.attendances.index', compact('classAssignments'));
     }
 }

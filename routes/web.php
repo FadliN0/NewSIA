@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Teacher\DashboardController;
 use App\Http\Controllers\Teacher\AttendanceController;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'role:admin'])
     Route::resource('subjects', SubjectController::class);
 
     Route::resource('semesters', SemesterController::class);
+
+    Route::resource('assignments', AssignmentController::class)->except(['show', 'edit', 'update']);
     
     // Reports
     Route::get('reports/academic', [AdminController::class, 'academicReports'])->name('reports.academic');
