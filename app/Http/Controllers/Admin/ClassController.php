@@ -15,11 +15,31 @@ class ClassController extends Controller
      */
     public function index()
     {
+        // 1. Ambil SEMUA data kelas dengan jumlah siswa untuk kalkulasi statistik
+        $allClasses = ClassRoom::withCount('students')->get();
+
+        // 2. Hitung semua statistik yang dibutuhkan untuk Quick Stat Cards
+        $stats = [
+            'available' => $allClasses->filter(function($class) {
+                return $class->students_count < $class->capacity;
+            })->count(),
+            'nearly_full' => $allClasses->filter(function($class) {
+                $percentage = $class->capacity > 0 ? ($class->students_count / $class->capacity) * 100 : 0;
+                return $percentage >= 80 && $percentage < 100;
+            })->count(),
+            'full' => $allClasses->filter(function($class) {
+                return $class->students_count >= $class->capacity;
+            })->count(),
+            'total_capacity' => $allClasses->sum('capacity'),
+        ];
+
+        // 3. Ambil data kelas lagi, tapi kali ini dengan paginasi untuk ditampilkan di tabel
         $classes = ClassRoom::withCount('students')
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10); // Anda bisa sesuaikan jumlah per halaman
 
-        return view('admin.classes.index', compact('classes'));
+        // 4. Kirim kedua set data ke view
+        return view('admin.classes.index', compact('classes', 'stats'));
     }
 
     /**
