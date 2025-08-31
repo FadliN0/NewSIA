@@ -14,12 +14,8 @@ class Subject extends Model
         'code',
         'description',
         'credit_hours',
-        'grade_levels',
     ];
 
-    protected $casts = [
-        'grade_levels' => 'array',
-    ];
 
     // Relationships
     public function teacherSubjects()
@@ -32,14 +28,4 @@ class Subject extends Model
         return $this->belongsToMany(Teacher::class, 'teacher_subjects', 'subject_id', 'teacher_id');
     }
 
-    // Helper methods
-    public function isForGradeLevel($gradeLevel)
-    {
-        return in_array($gradeLevel, $this->grade_levels);
-    }
-
-    public function getGradeLevelsText()
-    {
-        return 'Kelas ' . implode(', ', $this->grade_levels);
-    }
 }

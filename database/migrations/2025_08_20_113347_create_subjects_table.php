@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('code')->unique(); // MTK, FIS, KIM
             $table->text('description')->nullable();
             $table->integer('credit_hours')->default(2); // jam pelajaran per minggu
-            $table->json('grade_levels'); // [10, 11, 12] untuk kelas mana saja
             $table->timestamps();
         });
     }

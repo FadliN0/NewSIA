@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('semesters', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Semester 1, Semester 2, dst
-            $table->integer('grade_level'); // 10, 11, 12
             $table->string('school_year'); // 2024/2025
             $table->date('start_date');
             $table->date('end_date');

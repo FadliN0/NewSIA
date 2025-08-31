@@ -21,33 +21,31 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Menampilkan form untuk membuat penugasan baru.
+     * Menampilkan form untuk membuat penugasan baru dengan 3 dropdown.
      */
     public function create()
     {
-        // Ambil guru yang sudah punya mata pelajaran, tapi belum punya kelas
-        $unassignedTeachers = TeacherSubject::whereNull('class_room_id')->with(['teacher', 'subject'])->get();
+        $teachers = Teacher::orderBy('full_name')->get();
+        $subjects = Subject::orderBy('name')->get();
         $classes = ClassRoom::orderBy('name')->get();
 
-        return view('admin.assignments.create', compact('unassignedTeachers', 'classes'));
+        return view('admin.assignments.create', compact('teachers', 'subjects', 'classes'));
     }
 
     /**
-     * Menyimpan penugasan (menambahkan kelas ke penugasan yang ada).
+     * Menyimpan penugasan baru dengan membuat baris baru.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'teacher_subject_id' => 'required|exists:teacher_subjects,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'subject_id' => 'required|exists:subjects,id',
             'class_room_id' => 'required|exists:class_rooms,id',
         ]);
 
-        // Cari penugasan yang dipilih
-        $assignment = TeacherSubject::find($request->teacher_subject_id);
-
-        // Cek apakah sudah ada penugasan yang sama persis
-        $exists = TeacherSubject::where('teacher_id', $assignment->teacher_id)
-                                ->where('subject_id', $assignment->subject_id)
+        // Cek apakah penugasan yang sama persis sudah ada untuk mencegah duplikasi
+        $exists = TeacherSubject::where('teacher_id', $request->teacher_id)
+                                ->where('subject_id', $request->subject_id)
                                 ->where('class_room_id', $request->class_room_id)
                                 ->exists();
 
@@ -55,16 +53,12 @@ class AssignmentController extends Controller
             return redirect()->back()->with('error', 'Guru ini sudah ditugaskan mengajar mata pelajaran tersebut di kelas yang sama.');
         }
 
-        // Update penugasan yang lama dengan class_room_id
-        // ATAU buat baris baru jika ingin guru mengajar mapel yang sama di banyak kelas
-        $assignment->update([
-            'teacher_id' => $assignment->teacher_id,
-            'subject_id' => $assignment->subject_id,
+        // Selalu buat baris data baru, ini adalah logika yang benar
+        TeacherSubject::create([
+            'teacher_id' => $request->teacher_id,
+            'subject_id' => $request->subject_id,
             'class_room_id' => $request->class_room_id,
         ]);
-        
-        // Hapus penugasan lama yang class_room_id-nya null (opsional, tergantung logika bisnis)
-        // $assignment->delete();
 
         return redirect()->route('admin.assignments.index')->with('success', 'Penugasan berhasil dibuat.');
     }

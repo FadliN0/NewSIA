@@ -12,7 +12,6 @@ class Semester extends Model
 
     protected $fillable = [
         'name',
-        'grade_level',
         'school_year',
         'start_date',
         'end_date',

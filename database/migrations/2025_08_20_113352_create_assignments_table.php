@@ -13,13 +13,12 @@ return new class extends Migration
     {
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_subject_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('teacher_id')->constrained()->cascadeOnDelete(); // <-- KOLOM INI YANG HILANG
+            $table->foreignId('class_room_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('type', ['daily', 'uts', 'uas']); // tugas harian, UTS, UAS
-            $table->date('due_date')->nullable();
-            $table->string('file_path')->nullable(); // untuk upload file tugas
-            $table->integer('max_score')->default(100);
+            $table->date('due_date');
             $table->timestamps();
         });
     }

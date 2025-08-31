@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Teacher\DashboardController;
 use App\Http\Controllers\Teacher\AttendanceController;
+use App\Http\Controllers\Teacher\GradeController;
+use App\Http\Controllers\Teacher\TaskController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,8 +69,12 @@ Route::middleware(['auth', 'role:teacher'])
 ->as('teacher.')    // Tambahkan name agar menjadi teacher.*
 ->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
+    // Route untuk Absensi
     Route::resource('attendances', AttendanceController::class)->only(['index', 'create', 'store']);
+    // Route untuk Nilai
+    Route::resource('grades', GradeController::class)->only(['index', 'create', 'store']);
+    // Route untuk Tugas
+    Route::resource('assignments', TaskController::class);
 });
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {
