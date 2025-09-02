@@ -37,6 +37,8 @@
                                     <p class="font-semibold text-green-800">Input Nilai UAS</p>
                                     <span class="text-sm text-gray-600">Untuk {{ $assignment->subject->name }} &raquo;</span>
                                 </a>
+
+                                <a href="{{ route('teacher.grades.create', ['type' => 'tugas', 'id' => $assignment->id]) }}" class="text-indigo-600 hover:underline">Input Nilai</a>
                             @endforeach
                         </div>
                     @endforeach

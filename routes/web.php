@@ -12,6 +12,7 @@ use App\Http\Controllers\Teacher\DashboardController;
 use App\Http\Controllers\Teacher\AttendanceController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\TaskController;
+use App\Http\Controllers\Teacher\MaterialController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -75,6 +76,8 @@ Route::middleware(['auth', 'role:teacher'])
     Route::resource('grades', GradeController::class)->only(['index', 'create', 'store']);
     // Route untuk Tugas
     Route::resource('assignments', TaskController::class);
+    // Rute untuk Materi
+    Route::resource('materials', MaterialController::class)->except(['show', 'edit', 'update']);
 });
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {
