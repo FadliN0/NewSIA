@@ -34,6 +34,16 @@ class Grade extends Model
         return $this->belongsTo(Assignment::class);
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
     // Helper methods
     public function getLetterGrade()
     {
@@ -55,11 +65,6 @@ class Grade extends Model
             'D' => 'text-orange-600',
             'E' => 'text-red-600',
         };
-    }
-
-    public function getPercentage()
-    {
-        return ($this->score / $this->assignment->max_score) * 100;
     }
 
     public function isPassing()

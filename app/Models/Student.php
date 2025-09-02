@@ -53,31 +53,10 @@ class Student extends Model
     }
 
     // Helper methods
-    public function getAge()
-    {
-        return $this->birth_date ? $this->birth_date->age : null;
-    }
 
     public function getGenderText()
     {
         return $this->gender === 'male' ? 'Laki-laki' : 'Perempuan';
-    }
-
-    public function getCurrentSemester()
-    {
-        $currentYear = now()->year;
-        $yearsInSchool = $currentYear - $this->entry_year;
-        
-        // Asumsi: semester ganjil dimulai Juli, genap dimulai Januari
-        $currentMonth = now()->month;
-        $semesterInYear = $currentMonth >= 7 ? 1 : 2;
-        
-        return ($yearsInSchool * 2) + $semesterInYear;
-    }
-
-    public function getAverageGrade()
-    {
-        return $this->grades()->avg('score');
     }
 
     public function getGradesBySubject($subjectId)
@@ -89,14 +68,14 @@ class Student extends Model
                    ->get();
     }
 
-    public function getAttendancePercentage()
+    public function getAttendancePercentage(): float
     {
         $totalAttendances = $this->attendances()->count();
-        if ($totalAttendances === 0) return 0;
-        
-        $presentAttendances = $this->attendances()
-                                  ->where('status', 'present')
-                                  ->count();
+        if ($totalAttendances === 0) {
+            return 0;
+        }
+
+        $presentAttendances = $this->attendances()->where('status', 'Hadir')->count();
         
         return ($presentAttendances / $totalAttendances) * 100;
     }

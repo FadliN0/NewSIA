@@ -13,6 +13,12 @@ use App\Http\Controllers\Teacher\AttendanceController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\TaskController;
 use App\Http\Controllers\Teacher\MaterialController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\AssignmentController as StudentAssignmentController;
+use App\Http\Controllers\Student\GradeController as StudentGradeController;
+use App\Http\Controllers\Student\AttendanceController as StudentAttendanceController;
+use App\Http\Controllers\Student\MaterialController as StudentMaterialController;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,7 +32,7 @@ Route::get('/dashboard', function () {
     return match(auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),    
         'teacher' => redirect()->route('teacher.dashboard'),
-        default => redirect()->route('siswa.dashboard'),
+        default => redirect()->route('student.dashboard'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -80,8 +86,14 @@ Route::middleware(['auth', 'role:teacher'])
     Route::resource('materials', MaterialController::class)->except(['show', 'edit', 'update']);
 });
 
-Route::middleware(['auth', 'role:siswa'])->group(function () {
-    Route::get('/siswa', fn() => view('roles.siswa'))->name('siswa.dashboard');
+Route::middleware(['auth', 'role:student'])->prefix('student')->as('student.')->group(function () {
+    Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
+    Route::get('assignments', [StudentAssignmentController::class, 'index'])->name('assignments.index');
+    Route::get('assignments/{assignment}', [StudentAssignmentController::class, 'show'])->name('assignments.show');
+    Route::post('assignments/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('assignments.submit');
+    Route::get('grades', [StudentGradeController::class, 'index'])->name('grades.index');
+    Route::get('attendances', [StudentAttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('materials', [StudentMaterialController::class, 'index'])->name('materials.index');
 });
 
 // Default route profile

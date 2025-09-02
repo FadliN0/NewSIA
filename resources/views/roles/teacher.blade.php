@@ -127,7 +127,7 @@
                     <p class="text-gray-600 mt-1">Fitur yang sering Anda gunakan</p>
                 </div>
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <a href="{{ route('teacher.attendances.index') }}" class="group relative overflow-hidden bg-gradient-to-br from-teacher-primary to-teacher-primary/90 hover:from-teacher-primary/90 hover:to-teacher-primary rounded-xl p-6 text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                             <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div class="relative">
@@ -164,6 +164,19 @@
                                 </div>
                                 <h4 class="font-bold text-white text-lg mb-2">Kelola Tugas</h4>
                                 <p class="text-white/80 text-sm">Buat dan pantau tugas siswa</p>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('teacher.materials.index') }}" class="group relative overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 rounded-xl p-6 text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                            <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="relative">
+                                <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl mx-auto w-fit mb-4 group-hover:bg-white/30 transition-colors">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-white text-lg mb-2">Kelola Materi</h4>
+                                <p class="text-white/80 text-sm">Unggah dan kelola materi pembelajaran</p>
                             </div>
                         </a>
                     </div>
@@ -234,14 +247,17 @@
                                             </div>
                                         </div>
                                         
-                                        <!-- Action buttons could be added here -->
+                                        <!-- Action buttons -->
                                         <div class="mt-4 pt-3 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <div class="flex space-x-2">
-                                                <button class="flex-1 bg-teacher-accent/10 hover:bg-teacher-accent/20 text-teacher-accent text-xs font-medium py-2 px-3 rounded-lg transition-colors">
+                                            <div class="grid grid-cols-3 gap-2">
+                                                <button class="bg-teacher-accent/10 hover:bg-teacher-accent/20 text-teacher-accent text-xs font-medium py-2 px-3 rounded-lg transition-colors">
                                                     Absensi
                                                 </button>
-                                                <button class="flex-1 bg-teacher-primary/10 hover:bg-teacher-primary/20 text-teacher-primary text-xs font-medium py-2 px-3 rounded-lg transition-colors">
+                                                <button class="bg-teacher-primary/10 hover:bg-teacher-primary/20 text-teacher-primary text-xs font-medium py-2 px-3 rounded-lg transition-colors">
                                                     Nilai
+                                                </button>
+                                                <button class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium py-2 px-3 rounded-lg transition-colors">
+                                                    Materi
                                                 </button>
                                             </div>
                                         </div>
@@ -278,7 +294,7 @@
                         </div>
                         <h4 class="font-semibold text-charcoal">Tips Hari Ini</h4>
                     </div>
-                    <p class="text-gray-600 text-sm leading-relaxed">Manfaatkan fitur absensi digital untuk menghemat waktu dan meningkatkan akurasi pencatatan kehadiran siswa.</p>
+                    <p class="text-gray-600 text-sm leading-relaxed">Unggah materi pembelajaran secara digital untuk memudahkan akses siswa dan membuat pembelajaran lebih interaktif.</p>
                 </div>
 
                 <!-- Quick Stats -->

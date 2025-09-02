@@ -1,12 +1,11 @@
 <?php
-// app/Http/Controllers/AdminController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Teacher;
-use App\Models\ClassRoom; // Assuming your class model is named ClassModel
+use App\Models\ClassRoom; 
 use App\Models\Subject;
 use App\Models\Grade;
 use App\Models\Attendance;
