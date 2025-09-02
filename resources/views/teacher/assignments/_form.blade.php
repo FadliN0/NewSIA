@@ -21,7 +21,7 @@
     </div>
     <div>
         <label for="due_date" class="block text-sm font-medium text-gray-700">Tenggat Waktu</label>
-        <input type="date" name="due_date" id="due_date" value="{{ old('due_date', isset($assignment) ? \Carbon\Carbon::parse($assignment->due_date)->format('Y-m-d') : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+        <input type="datetime-local" name="due_date" id="due_date" value="{{ old('due_date', isset($assignment) ? \Carbon\Carbon::parse($assignment->due_date)->format('Y-m-d\TH:i') : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
     </div>
 </div>
 <div class="mt-6 flex justify-end">

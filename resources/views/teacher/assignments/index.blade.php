@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Kelola Tugas') }}</h2>
-            <a href="{{ route('teacher.assignments.create') }}" class="px-4 py-2 bg-indigo-600 text-black rounded-md text-sm">
+            <a href="{{ route('teacher.assignments.create') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm">
                 + Buat Tugas Baru
             </a>
         </div>
@@ -32,13 +32,14 @@
                                 <td class="px-6 py-4">{{ $assignment->title }}</td>
                                 <td class="px-6 py-4">{{ $assignment->classRoom->name }}</td>
                                 <td class="px-6 py-4">{{ $assignment->subject->name }}</td>
-                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($assignment->due_date)->format('d M Y') }}</td>
+                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($assignment->due_date)->format('d M Y H:i') }}</td>
                                 <td class="px-6 py-4 text-right text-sm space-x-2">
                                     <a href="{{ route('teacher.assignments.edit', $assignment) }}" class="text-indigo-600 hover:underline">Edit</a>
                                     <form action="{{ route('teacher.assignments.destroy', $assignment) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus tugas ini?');">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:underline">Hapus</button>
                                     </form>
+                                    <a href="{{ route('teacher.grades.create', ['type' => 'tugas', 'id' => $assignment->id]) }}" class="text-indigo-600 hover:underline">Input Nilai</a>
                                 </td>
                             </tr>
                         @empty

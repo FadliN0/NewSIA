@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Grade;
 use App\Models\TeacherSubject;
 use App\Models\Semester;
+use App\Models\Assignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -13,104 +14,131 @@ use Illuminate\Support\Facades\Validator;
 class GradeController extends Controller
 {
     /**
-     * LANGKAH 1: Menampilkan halaman untuk memilih kelas dan mata pelajaran.
+     * Menampilkan halaman untuk memilih jenis input nilai (Tugas, UTS, UAS).
      */
     public function index()
     {
         $teacher = Auth::user()->teacher;
 
-        $assignments = $teacher->assignments()
-            ->whereNotNull('class_room_id')
+        $teacherSubjects = $teacher->teacherSubjects()
             ->with(['classRoom', 'subject'])
-            ->get();
-        
-        $classAssignments = $assignments->groupBy('classRoom.name');
+            ->get()
+            ->groupBy('classRoom.name');
 
-        return view('teacher.grades.index', compact('classAssignments'));
+        return view('teacher.grades.index', compact('teacherSubjects'));
     }
 
     /**
-     * LANGKAH 2: Menampilkan form untuk menginput nilai.
+     * Menampilkan form input nilai berdasarkan jenis (tugas, uts, uas) dan ID.
      */
     public function create(Request $request)
     {
-        $assignmentId = $request->query('assignment_id');
-        $assignment = TeacherSubject::with(['classRoom.students', 'subject'])->find($assignmentId);
+        $type = $request->query('type');
+        $id = $request->query('id');
+        $teacher = Auth::user()->teacher;
         $activeSemester = Semester::where('is_active', true)->first();
 
         if (!$activeSemester) {
             return redirect()->route('teacher.grades.index')->with('error', 'Tidak ada semester yang aktif. Tidak dapat menginput nilai.');
         }
 
-        if (!$assignment || $assignment->teacher_id !== Auth::user()->teacher->id) {
-            abort(403, 'Anda tidak memiliki akses ke sumber daya ini.');
+        // Tentukan data yang akan ditampilkan berdasarkan tipe
+        if ($type === 'tugas') {
+            $assignment = Assignment::with(['classRoom.students', 'subject'])->find($id);
+
+            if (!$assignment || $assignment->teacher_id !== $teacher->id) {
+                abort(403, 'Anda tidak memiliki akses ke sumber daya ini.');
+            }
+
+            $students = $assignment->classRoom->students()->orderBy('full_name')->get();
+            $existingGrades = Grade::where('assignment_id', $assignment->id)->get()->groupBy('student_id');
+            $viewTitle = 'Input Nilai Tugas: ' . $assignment->title . ' - Kelas ' . $assignment->classRoom->name;
+
+        } elseif (in_array($type, ['UTS', 'UAS'])) {
+            $teacherSubject = TeacherSubject::with(['classRoom.students', 'subject'])->find($id);
+
+            if (!$teacherSubject || $teacherSubject->teacher_id !== $teacher->id) {
+                abort(403, 'Anda tidak memiliki akses ke sumber daya ini.');
+            }
+
+            $students = $teacherSubject->classRoom->students()->orderBy('full_name')->get();
+            $existingGrades = Grade::where('subject_id', $teacherSubject->subject_id)
+                ->where('semester_id', $activeSemester->id)
+                ->where('grade_type', $type)
+                ->whereIn('student_id', $students->pluck('id'))
+                ->get()
+                ->groupBy('student_id');
+            $viewTitle = 'Input Nilai ' . $type . ': ' . $teacherSubject->subject->name . ' - Kelas ' . $teacherSubject->classRoom->name;
+        
+        } else {
+            return redirect()->route('teacher.grades.index')->with('error', 'Tipe nilai tidak valid.');
         }
 
-        $students = $assignment->classRoom->students()->orderBy('full_name')->get();
-
-        // Ambil nilai yang sudah ada untuk siswa di kelas ini agar bisa ditampilkan di form
-        $existingGrades = Grade::where('subject_id', $assignment->subject_id)
-            ->where('semester_id', $activeSemester->id)
-            ->whereIn('student_id', $students->pluck('id'))
-            ->get()
-            ->groupBy('student_id');
-
-        return view('teacher.grades.create', compact('assignment', 'students', 'activeSemester', 'existingGrades'));
+        return view('teacher.grades.create', compact('students', 'activeSemester', 'existingGrades', 'viewTitle', 'type', 'id'));
     }
 
     /**
-     * LANGKAH 3: Menyimpan data nilai yang diinput dari form.
+     * Menyimpan data nilai yang diinput dari form.
      */
     public function store(Request $request)
     {
-        // 1. Validasi data dasar
-        $validator = Validator::make($request->all(), [
-            'assignment_id' => 'required|exists:teacher_subjects,id',
+        $request->validate([
+            'id' => 'required',
+            'type' => ['required', Rule::in(['tugas', 'UTS', 'UAS'])],
             'grades' => 'required|array',
-            // Validasi setiap nilai yang diinput
-            'grades.*.Tugas' => 'nullable|numeric|min:0|max:100',
-            'grades.*.UTS' => 'nullable|numeric|min:0|max:100',
-            'grades.*.UAS' => 'nullable|numeric|min:0|max:100',
+            'grades.*' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        // 2. Ambil data penting
-        $assignment = TeacherSubject::find($request->assignment_id);
         $activeSemester = Semester::where('is_active', true)->first();
-
-        // Cek otorisasi
-        if ($assignment->teacher_id !== Auth::user()->teacher->id) {
-            abort(403, 'Anda tidak memiliki hak akses.');
-        }
         if (!$activeSemester) {
             return redirect()->back()->with('error', 'Tidak ada semester aktif.');
         }
 
-        // 3. Looping untuk menyimpan setiap nilai
-        foreach ($request->grades as $studentId => $gradeTypes) {
-            foreach ($gradeTypes as $gradeType => $score) {
-                // Hanya simpan jika ada nilainya (tidak kosong)
-                if (!is_null($score)) {
-                    Grade::updateOrCreate(
-                        [
-                            'student_id' => $studentId,
-                            'subject_id' => $assignment->subject_id,
-                            'semester_id' => $activeSemester->id,
-                            'grade_type' => $gradeType,
-                        ],
-                        [
-                            'score' => $score,
-                        ]
-                    );
+        // Tentukan data yang relevan berdasarkan tipe
+        if ($request->type === 'tugas') {
+            $assignment = Assignment::with(['classRoom', 'subject'])->find($request->id);
+            if (!$assignment || $assignment->teacher_id !== Auth::user()->teacher->id) {
+                abort(403, 'Anda tidak memiliki hak akses.');
+            }
+            $subjectId = $assignment->subject_id;
+            $classRoomId = $assignment->classRoom->id;
+        } else {
+            $teacherSubject = TeacherSubject::with(['classRoom', 'subject'])->find($request->id);
+            if (!$teacherSubject || $teacherSubject->teacher_id !== Auth::user()->teacher->id) {
+                abort(403, 'Anda tidak memiliki hak akses.');
+            }
+            $subjectId = $teacherSubject->subject_id;
+            $classRoomId = $teacherSubject->classRoom->id;
+        }
+
+        foreach ($request->grades as $studentId => $score) {
+            if (!is_null($score)) {
+                $data = [
+                    'student_id' => $studentId,
+                    'subject_id' => $subjectId,
+                    'semester_id' => $activeSemester->id,
+                    'grade_type' => $request->type === 'tugas' ? 'Tugas' : $request->type, // Ubah tipe menjadi 'Tugas' jika dari alur tugas
+                    'score' => $score,
+                ];
+
+                if ($request->type === 'tugas') {
+                    $data['assignment_id'] = $request->id;
                 }
+                
+                Grade::updateOrCreate(
+                    array_filter([
+                        'student_id' => $studentId,
+                        'subject_id' => $subjectId,
+                        'semester_id' => $activeSemester->id,
+                        'grade_type' => $request->type === 'tugas' ? 'Tugas' : $request->type,
+                        'assignment_id' => $request->type === 'tugas' ? $request->id : null,
+                    ]),
+                    ['score' => $score]
+                );
             }
         }
 
-        // 4. Kembali ke halaman pemilihan dengan pesan sukses
-        return redirect()->route('teacher.grades.index')
-                         ->with('success', 'Nilai untuk kelas ' . $assignment->classRoom->name . ' pada mata pelajaran ' . $assignment->subject->name . ' berhasil disimpan!');
+        $message = 'Nilai berhasil disimpan!';
+        return redirect()->route('teacher.grades.index')->with('success', $message);
     }
 }

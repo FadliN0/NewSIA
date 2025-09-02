@@ -18,25 +18,28 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-xl font-semibold mb-4">Pilih Kelas dan Mata Pelajaran</h3>
-                    
-                    @forelse($classAssignments as $className => $assignments)
-                        <div class="mb-6">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Pilih Jenis Nilai</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <a href="{{ route('teacher.assignments.index') }}" class="block p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition">
+                        <p class="font-semibold text-blue-800">Input Nilai Tugas</p>
+                        <span class="text-sm text-gray-600">Pilih tugas yang sudah dibuat &raquo;</span>
+                    </a>
+                    @foreach($teacherSubjects as $className => $assignments)
+                        <div class="p-4 bg-green-50 rounded-lg border border-green-200">
                             <h4 class="font-bold text-lg text-gray-700 border-b pb-2 mb-3">Kelas: {{ $className }}</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach($assignments as $assignment)
-                                    <a href="{{ route('teacher.grades.create', ['assignment_id' => $assignment->id]) }}" class="block p-4 bg-lime-50 hover:bg-lime-100 rounded-lg border border-lime-200 transition">
-                                        <p class="font-semibold text-lime-800">{{ $assignment->subject->name }}</p>
-                                        <span class="text-sm text-gray-600">Pilih untuk input nilai &raquo;</span>
-                                    </a>
-                                @endforeach
-                            </div>
+                            @foreach($assignments as $assignment)
+                                <a href="{{ route('teacher.grades.create', ['type' => 'UTS', 'id' => $assignment->id]) }}" class="block mt-2 p-2 bg-green-100 hover:bg-green-200 rounded transition">
+                                    <p class="font-semibold text-green-800">Input Nilai UTS</p>
+                                    <span class="text-sm text-gray-600">Untuk {{ $assignment->subject->name }} &raquo;</span>
+                                </a>
+                                <a href="{{ route('teacher.grades.create', ['type' => 'UAS', 'id' => $assignment->id]) }}" class="block mt-2 p-2 bg-green-100 hover:bg-green-200 rounded transition">
+                                    <p class="font-semibold text-green-800">Input Nilai UAS</p>
+                                    <span class="text-sm text-gray-600">Untuk {{ $assignment->subject->name }} &raquo;</span>
+                                </a>
+                            @endforeach
                         </div>
-                    @empty
-                        <p class="text-gray-500">Anda belum ditugaskan untuk mengajar di kelas manapun.</p>
-                    @endforelse
+                    @endforeach
                 </div>
             </div>
         </div>

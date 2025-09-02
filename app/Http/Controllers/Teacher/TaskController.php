@@ -36,7 +36,7 @@ class TaskController extends Controller
             'teacher_subject_id' => 'required|exists:teacher_subjects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'due_date' => 'required|date',
+            'due_date' => 'required|date_format:Y-m-d\TH:i', // Format HTML5 datetime-local
         ]);
 
         $assignment = TeacherSubject::find($request->teacher_subject_id);
@@ -76,7 +76,7 @@ class TaskController extends Controller
             'teacher_subject_id' => 'required|exists:teacher_subjects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'due_date' => 'required|date',
+            'due_date' => 'required|date_format:Y-m-d\TH:i',
         ]);
 
         $newAssignmentInfo = TeacherSubject::find($request->teacher_subject_id);
