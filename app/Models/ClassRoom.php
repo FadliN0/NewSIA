@@ -27,6 +27,22 @@ class ClassRoom extends Model
         return $this->hasMany(TeacherSubject::class);
     }
 
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'teacher_subjects', 'class_room_id', 'subject_id')
+                   ->distinct();
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
+    }
+
     // Helper methods
     public function getCurrentStudentsCount()
     {

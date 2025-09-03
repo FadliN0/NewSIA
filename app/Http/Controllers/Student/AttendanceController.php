@@ -15,11 +15,17 @@ class AttendanceController extends Controller
         $student = Auth::user()->student;
         $activeSemester = Semester::where('is_active', true)->first();
 
+        if (!$activeSemester) {
+            return view('student.attendances.index', [
+                'recap' => collect()
+            ]);
+        }
+
         // Ambil data absensi siswa
         $attendances = Attendance::where('student_id', $student->id)
             ->where('semester_id', $activeSemester->id)
             ->with('subject')
-            ->latest('date')
+            ->latest('attendance_date')
             ->get();
 
         // Buat rekapitulasi per mata pelajaran

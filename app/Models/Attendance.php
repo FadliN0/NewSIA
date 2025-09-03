@@ -33,9 +33,19 @@ class Attendance extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function teacherSubject()
+    // public function teacherSubject()
+    // {
+    //     return $this->belongsTo(TeacherSubject::class);
+    // }
+    
+    public function subject()
     {
-        return $this->belongsTo(TeacherSubject::class);
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
     }
 
     // Helper methods
@@ -63,13 +73,13 @@ class Attendance extends Model
         };
     }
 
-    public function isPresent()
-    {
-        return in_array($this->status, ['present', 'late']);
-    }
+    // public function isPresent()
+    // {
+    //     return in_array($this->status, ['present', 'late']);
+    // }
 
-    public function isAbsent()
-    {
-        return in_array($this->status, ['absent', 'sick', 'permission']);
-    }
+    // public function isAbsent()
+    // {
+    //     return in_array($this->status, ['absent', 'sick', 'permission']);
+    // }
 }

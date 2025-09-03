@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Grade;
 use App\Models\Semester;
 use App\Models\Subject;
+use App\Models\TeacherSubject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,39 +20,55 @@ class DashboardController extends Controller
         $student = Auth::user()->student;
         $activeSemester = Semester::where('is_active', true)->first();
         
-        // Ambil data statistik dari model yang sudah diperbaiki
-        $subjects = $student->classRoom->subjects ?? collect();
-        $subjectCount = $subjects->count();
+        // Jika tidak ada semester aktif, buat data kosong
+        if (!$activeSemester) {
+            return view('roles.student', [
+                'student' => $student,
+                'subjectCount' => 0,
+                'averageGrade' => 0,
+                'attendancePercentage' => 0,
+                'upcomingAssignments' => collect(),
+                'subjectGrades' => collect()
+            ]);
+        }
 
-        // Rata-rata nilai
-        $averageGrade = Grade::where('student_id', $student->id)
-            ->where('semester_id', optional($activeSemester)->id)
-            ->avg('score');
-
-        // Rekapitulasi kehadiran
-        $totalAttendance = Attendance::where('student_id', $student->id)
-            ->where('semester_id', optional($activeSemester)->id)
+        // 1. Hitung jumlah mata pelajaran berdasarkan TeacherSubject
+        $subjectCount = TeacherSubject::where('class_room_id', $student->class_room_id)
+            ->where('semester_id', $activeSemester->id)
+            ->distinct('subject_id')
             ->count();
+
+        // 2. Rata-rata nilai - pastikan ada data
+        $averageGrade = Grade::where('student_id', $student->id)
+            ->where('semester_id', $activeSemester->id)
+            ->avg('score') ?? 0;
+
+        // 3. Rekapitulasi kehadiran - gunakan field yang benar
+        $totalAttendance = Attendance::where('student_id', $student->id)
+            ->where('semester_id', $activeSemester->id)
+            ->count();
+            
         $presentCount = Attendance::where('student_id', $student->id)
-            ->where('semester_id', optional($activeSemester)->id)
+            ->where('semester_id', $activeSemester->id)
             ->where('status', 'Hadir')
             ->count();
-        $attendancePercentage = $totalAttendance > 0 ? ($presentCount / $totalAttendance) * 100 : 0;
+            
+        $attendancePercentage = $totalAttendance > 0 ? round(($presentCount / $totalAttendance) * 100, 1) : 0;
         
-        // Data untuk grafik
+        // 4. Data untuk grafik nilai per mata pelajaran
         $subjectGrades = Grade::select('subject_id', DB::raw('avg(score) as average_score'))
             ->where('student_id', $student->id)
-            ->where('semester_id', optional($activeSemester)->id)
+            ->where('semester_id', $activeSemester->id)
             ->groupBy('subject_id')
             ->with('subject')
             ->get();
             
-        // Ambil tugas yang akan datang
+        // 5. Ambil tugas yang akan datang (belum lewat deadline)
         $upcomingAssignments = Assignment::where('class_room_id', $student->class_room_id)
             ->where('due_date', '>=', now())
             ->orderBy('due_date')
             ->take(5)
-            ->with(['subject'])
+            ->with(['subject', 'teacher'])
             ->get();
         
         return view('roles.student', compact(
