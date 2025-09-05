@@ -1,7 +1,7 @@
 <x-teacher-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Input Nilai Siswa') }}
+            {{ __('Rekap Nilai Siswa') }}
         </h2>
     </x-slot>
 
@@ -19,30 +19,57 @@
             @endif
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">Pilih Jenis Nilai</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <a href="{{ route('teacher.assignments.index') }}" class="block p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition">
-                        <p class="font-semibold text-blue-800">Input Nilai Tugas</p>
-                        <span class="text-sm text-gray-600">Pilih tugas yang sudah dibuat &raquo;</span>
-                    </a>
-                    @foreach($teacherSubjects as $className => $assignments)
-                        <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                            <h4 class="font-bold text-lg text-gray-700 border-b pb-2 mb-3">Kelas: {{ $className }}</h4>
-                            @foreach($assignments as $assignment)
-                                <a href="{{ route('teacher.grades.create', ['type' => 'UTS', 'id' => $assignment->id]) }}" class="block mt-2 p-2 bg-green-100 hover:bg-green-200 rounded transition">
-                                    <p class="font-semibold text-green-800">Input Nilai UTS</p>
-                                    <span class="text-sm text-gray-600">Untuk {{ $assignment->subject->name }} &raquo;</span>
-                                </a>
-                                <a href="{{ route('teacher.grades.create', ['type' => 'UAS', 'id' => $assignment->id]) }}" class="block mt-2 p-2 bg-green-100 hover:bg-green-200 rounded transition">
-                                    <p class="font-semibold text-green-800">Input Nilai UAS</p>
-                                    <span class="text-sm text-gray-600">Untuk {{ $assignment->subject->name }} &raquo;</span>
-                                </a>
+                @forelse($gradesData as $data)
+                    <div class="mb-6 border rounded-lg">
+                        <details>
+                            <summary class="cursor-pointer p-4 hover:bg-gray-50 flex justify-between items-center">
+                                <h4 class="font-bold text-lg text-gray-700">
+                                    Kelas: {{ $data['class_room_name'] }} - Mata Pelajaran: {{ $data['subject_name'] }}
+                                </h4>
+                                <span class="text-gray-500 hover:text-gray-900">
+                                    &raquo;
+                                </span>
+                            </summary>
+                            
+                            <div class="p-4 border-t bg-gray-50">
+                                <h5 class="font-semibold text-gray-800 mb-2">Rekap Nilai Siswa</h5>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Siswa</th>
+                                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Rata-rata Tugas</th>
+                                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">UTS</th>
+                                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">UAS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            @foreach($data['students'] as $student)
+                                                <tr>
+                                                    <td class="px-6 py-4">{{ $student['full_name'] }}</td>
+                                                    <td class="px-6 py-4 text-center">{{ $student['average_task_grade'] }}</td>
+                                                    <td class="px-6 py-4 text-center">{{ $student['uts_grade'] }}</td>
+                                                    <td class="px-6 py-4 text-center">{{ $student['uas_grade'] }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
 
-                                <a href="{{ route('teacher.grades.create', ['type' => 'tugas', 'id' => $assignment->id]) }}" class="text-indigo-600 hover:underline">Input Nilai</a>
-                            @endforeach
-                        </div>
-                    @endforeach
-                </div>
+                            <div class="p-4 border-t bg-gray-50 flex justify-end space-x-2">
+                                <a href="{{ route('teacher.grades.create', ['type' => 'UTS', 'id' => $data['teacher_subject_id']]) }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm">
+                                    Input Nilai UTS
+                                </a>
+                                <a href="{{ route('teacher.grades.create', ['type' => 'UAS', 'id' => $data['teacher_subject_id']]) }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm">
+                                    Input Nilai UAS
+                                </a>
+                            </div>
+                        </details>
+                    </div>
+                @empty
+                    <p class="text-gray-500">Anda belum ditugaskan untuk mengajar di kelas manapun di semester aktif ini.</p>
+                @endforelse
             </div>
         </div>
     </div>

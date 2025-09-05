@@ -29,6 +29,7 @@
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Tugas</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">UTS</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">UAS</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Kehadiran</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Nilai Akhir</th>
                             </tr>
                         </thead>
@@ -39,6 +40,7 @@
                                     <td class="px-6 py-4 text-center">{{ number_format($data['tugas'], 2) }}</td>
                                     <td class="px-6 py-4 text-center">{{ number_format($data['uts'], 2) }}</td>
                                     <td class="px-6 py-4 text-center">{{ number_format($data['uas'], 2) }}</td>
+                                    <td class="px-6 py-4 text-center">{{ number_format($data['attendance']) }}</td>
                                     <td class="px-6 py-4 text-center font-bold {{ $data['final_grade'] < 75 ? 'text-red-500' : 'text-green-600' }}">
                                         {{ $data['final_grade'] }}
                                     </td>
@@ -47,6 +49,14 @@
                                 <tr><td colspan="5" class="text-center py-4">Tidak ada nilai yang tersedia untuk semester ini.</td></tr>
                             @endforelse
                         </tbody>
+                        <tfoot class="bg-gray-50">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-right font-bold text-gray-900">Nilai Akhir Rata-rata</td>
+                                <td class="px-6 py-4 text-center font-bold text-lg {{ $averageFinalGrade < 75 ? 'text-red-500' : 'text-green-600' }}">
+                                    {{ number_format($averageFinalGrade, 2) }}
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

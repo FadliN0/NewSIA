@@ -13,6 +13,7 @@ use App\Http\Controllers\Teacher\AttendanceController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\TaskController;
 use App\Http\Controllers\Teacher\MaterialController;
+use App\Http\Controllers\Teacher\SubmissionController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\AssignmentController as StudentAssignmentController;
 use App\Http\Controllers\Student\GradeController as StudentGradeController;
@@ -84,6 +85,8 @@ Route::middleware(['auth', 'role:teacher'])
     Route::resource('assignments', TaskController::class);
     // Rute untuk Materi
     Route::resource('materials', MaterialController::class)->except(['show', 'edit', 'update']);
+    Route::get('assignments/{assignment}/submissions', [SubmissionController::class, 'show'])->name('assignments.submission');
+    Route::post('assignments/{assignment}/store-grades', [SubmissionController::class, 'storeGrades'])->name('assignments.storeGrades');
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->as('student.')->group(function () {

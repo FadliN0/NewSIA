@@ -17,7 +17,7 @@ class MaterialController extends Controller
         $materials = Material::where('teacher_id', $teacher->id)
             ->with(['classRoom', 'subject'])
             ->latest()
-            ->paginate(10);
+            ->paginate(10); 
         
         return view('teacher.materials.index', compact('materials'));
     }
@@ -25,8 +25,15 @@ class MaterialController extends Controller
     public function create()
     {
         $teacher = Auth::user()->teacher;
-        $classSubjects = $teacher->teacherSubjects()->with(['classRoom', 'subject'])->get();
-        
+        $classSubjects = $teacher->teacherSubjects()
+            ->with(['classRoom', 'subject'])
+            ->get();
+
+        // Urutkan koleksi berdasarkan nama kelas (classRoom->name)
+        $classSubjects = $classSubjects->sortBy(function ($teacherSubject) {
+            return $teacherSubject->classRoom->name;
+        });
+                                                                                                    
         return view('teacher.materials.create', compact('classSubjects'));
     }
 

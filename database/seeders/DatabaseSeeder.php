@@ -127,12 +127,13 @@ class DatabaseSeeder extends Seeder
         // 7. Create Teacher Assignments (Menugaskan Guru ke Kelas)
         foreach ($classes as $classRoom) {
             // Tugaskan 2 mata pelajaran berbeda ke setiap kelas
-            $randomSubjects = $subjects->random(2);
+            $randomSubjects = $subjects->random(3);
             foreach($randomSubjects as $subject) {
                 TeacherSubject::create([
                     'teacher_id' => $teachers->random()->id, // Pilih guru secara acak
                     'subject_id' => $subject->id,
                     'class_room_id' => $classRoom->id,
+                    'semester_id' => Semester::where('is_active', true)->first()->id,
                 ]);
             }
         }

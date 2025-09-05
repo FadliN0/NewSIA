@@ -39,7 +39,7 @@
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:underline">Hapus</button>
                                     </form>
-                                    <a href="{{ route('teacher.grades.create', ['type' => 'tugas', 'id' => $assignment->id]) }}" class="text-indigo-600 hover:underline">Input Nilai</a>
+                                    <a href="{{ route('teacher.assignments.submission', $assignment) }}" class="text-blue-600 hover:underline">Cek Tugas</a>
                                 </td>
                             </tr>
                         @empty

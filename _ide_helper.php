@@ -27843,8 +27843,3 @@ namespace  {
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
 }
-
-
-
-
-

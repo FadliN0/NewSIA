@@ -7,6 +7,7 @@ use App\Models\TeacherSubject;
 use App\Models\Teacher;
 use App\Models\Subject;
 use App\Models\ClassRoom;
+use App\Models\Semester; // 🔹 tambahkan model Semester
 use Illuminate\Http\Request;
 
 class AssignmentController extends Controller
@@ -43,27 +44,35 @@ class AssignmentController extends Controller
             'class_room_id' => 'required|exists:class_rooms,id',
         ]);
 
+        // 🔹 Ambil semester aktif
+        $activeSemester = Semester::where('is_active', true)->first();
+        if (!$activeSemester) {
+            return redirect()->back()->with('error', 'Tidak ada semester aktif. Tidak dapat membuat penugasan.');
+        }
+
         // Cek apakah penugasan yang sama persis sudah ada untuk mencegah duplikasi
         $exists = TeacherSubject::where('teacher_id', $request->teacher_id)
                                 ->where('subject_id', $request->subject_id)
                                 ->where('class_room_id', $request->class_room_id)
+                                ->where('semester_id', $activeSemester->id) // 🔹 filter semester juga
                                 ->exists();
 
         if ($exists) {
-            return redirect()->back()->with('error', 'Guru ini sudah ditugaskan mengajar mata pelajaran tersebut di kelas yang sama.');
+            return redirect()->back()->with('error', 'Guru ini sudah ditugaskan mengajar mata pelajaran tersebut di kelas yang sama untuk semester aktif.');
         }
 
         // Selalu buat baris data baru, ini adalah logika yang benar
         TeacherSubject::create([
-            'teacher_id' => $request->teacher_id,
-            'subject_id' => $request->subject_id,
+            'teacher_id'    => $request->teacher_id,
+            'subject_id'    => $request->subject_id,
             'class_room_id' => $request->class_room_id,
+            'semester_id'   => $activeSemester->id, // 🔹 simpan semester aktif
         ]);
 
         return redirect()->route('admin.assignments.index')->with('success', 'Penugasan berhasil dibuat.');
     }
 
-     /**
+    /**
      * Menghapus penugasan mengajar.
      */
     public function destroy(TeacherSubject $assignment)
