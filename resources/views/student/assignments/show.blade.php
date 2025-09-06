@@ -3,7 +3,7 @@
         <div class="flex items-center">
             <a href="{{ route('student.assignments.index') }}" class="mr-4 text-gray-500 hover:text-gray-700">&larr; Kembali</a>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Tugas:') }} {{ $assignment->title }}
+                {{ __('Detail Tugas') }} {{ $assignment->title }}
             </h2>
         </div>
     </x-slot>

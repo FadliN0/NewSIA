@@ -75,7 +75,7 @@ class StudentController extends Controller
                 'name' => $request->full_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => 'siswa', // Set role default ke 'siswa'
+                'role' => 'student', // Set role default ke 'siswa'
             ]);
 
             // 2. Create Student

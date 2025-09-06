@@ -67,7 +67,7 @@ class TeacherController extends Controller
                 'name' => $request->full_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => 'guru', // Set role default ke 'guru'
+                'role' => 'teacher', // Set role default ke 'guru'
             ]);
 
             // 2. Create Teacher

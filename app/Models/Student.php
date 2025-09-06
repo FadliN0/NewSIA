@@ -52,6 +52,11 @@ class Student extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function submissions()
+    {
+        return $this->hasMany(Submission::class);
+    }
+
     // Helper methods
 
     public function getGenderText()

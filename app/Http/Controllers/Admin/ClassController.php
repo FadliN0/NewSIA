@@ -21,16 +21,16 @@ class ClassController extends Controller
         // 2. Hitung semua statistik yang dibutuhkan untuk Quick Stat Cards
         $stats = [
             'available' => $allClasses->filter(function($class) {
-                return $class->students_count < $class->capacity;
+                return $class->students_count < $class->max_students;
             })->count(),
             'nearly_full' => $allClasses->filter(function($class) {
-                $percentage = $class->capacity > 0 ? ($class->students_count / $class->capacity) * 100 : 0;
+                $percentage = $class->max_students > 0 ? ($class->students_count / $class->max_students) * 100 : 0;
                 return $percentage >= 80 && $percentage < 100;
             })->count(),
             'full' => $allClasses->filter(function($class) {
-                return $class->students_count >= $class->capacity;
+                return $class->students_count >= $class->max_students;
             })->count(),
-            'total_capacity' => $allClasses->sum('capacity'),
+            'total_capacity' => $allClasses->sum('max_students'),
         ];
 
         // 3. Ambil data kelas lagi, tapi kali ini dengan paginasi untuk ditampilkan di tabel
@@ -56,9 +56,9 @@ class ClassController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:10|unique:classes,name',
+            'name' => 'required|string|max:10|unique:class_rooms,name',
             'grade_level' => 'required|integer|min:10|max:12',
-            'capacity' => 'required|integer|min:1|max:50',
+            'max_students' => 'required|integer|min:1|max:50',
             'description' => 'nullable|string|max:255'
         ]);
 
@@ -68,12 +68,7 @@ class ClassController extends Controller
                 ->withInput();
         }
 
-        ClassRoom::create([
-            'name' => $request->name,
-            'grade_level' => $request->grade_level,
-            'capacity' => $request->capacity,
-            'description' => $request->description,
-        ]);
+        ClassRoom::create($request->all());
 
         return redirect()->route('admin.classes.index')
             ->with('success', 'Kelas berhasil ditambahkan!');
@@ -85,14 +80,14 @@ class ClassController extends Controller
     public function show(ClassRoom $class)
     {
         $class->load(['students' => function($query) {
-            $query->orderBy('name');
+            $query->orderBy('full_name');
         }]);
 
         // Get class statistics
         $stats = [
             'total_students' => $class->students->count(),
-            'capacity_used' => round(($class->students->count() / $class->capacity) * 100, 1),
-            'available_seats' => $class->capacity - $class->students->count()
+            'capacity_used' => round(($class->students->count() / $class->max_students) * 100, 1),
+            'available_seats' => $class->max_students - $class->students->count()
         ];
 
         return view('admin.classes.show', compact('class', 'stats'));
@@ -112,9 +107,9 @@ class ClassController extends Controller
     public function update(Request $request, ClassRoom $class)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:10|unique:classes,name,' . $class->id,
+            'name' => 'required|string|max:10|unique:class_rooms,name,' . $class->id,
             'grade_level' => 'required|integer|min:10|max:12',
-            'capacity' => 'required|integer|min:1|max:50',
+            'max_students' => 'required|integer|min:1|max:50',
             'description' => 'nullable|string|max:255'
         ]);
 
@@ -124,8 +119,8 @@ class ClassController extends Controller
                 ->withInput();
         }
 
-        // Check if reducing capacity below current student count
-        if ($request->capacity < $class->students->count()) {
+        // Check if reducing max_students below current student count
+        if ($request->max_students < $class->students->count()) {
             return redirect()->back()
                 ->withErrors(['capacity' => 'Kapasitas tidak boleh kurang dari jumlah siswa saat ini (' . $class->students->count() . ')'])
                 ->withInput();
